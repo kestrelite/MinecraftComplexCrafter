@@ -8,9 +8,17 @@ public class Recipe {
     
     public boolean prepCraft = false;
     public boolean hasRecipe = false;
+    public boolean basic = false;
+    
+    public String machine = "";
     
     public void addItemRequirement(String item, int quantity) {
         hasRecipe = true;
+        if(items.contains(item)) {
+            int ind = items.indexOf(item);
+            items.remove(ind);
+            this.quantity.remove(ind);
+        }
         items.add(item);
         this.quantity.add(quantity);
     }

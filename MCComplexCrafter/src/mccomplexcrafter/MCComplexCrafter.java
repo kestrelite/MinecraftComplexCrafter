@@ -1,6 +1,8 @@
 package mccomplexcrafter;
 
+import itemtree.ItemNode;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.Scanner;
 
 public class MCComplexCrafter {
@@ -64,7 +66,48 @@ public class MCComplexCrafter {
                     if(!itemList.get(input[1]).hasRecipe) {System.out.println("This item has no recipe."); break;}
                     System.out.println(itemList.get(input[1]));
                     break;
+                case "tree": case "t":
+                    if(input.length < 2) {System.out.println("Not enough arguments."); break;}
+                    if(!itemList.containsKey(input[1])) {System.out.println("Item does not exist."); break;}
+                    System.out.println("Entering build tree tool for \"" + input[1] + "\"...");
+                    treeTool(input[1]);
+                    break;
                 default:
+                    System.out.println("Command not recognized: " + input[0]);
+            }
+        }
+    }
+
+    private static void treeTool(String item) {
+        ItemNode.clearStatics();
+        ItemNode tree = new ItemNode(item);
+        boolean exit = false;
+        while(exit == false) {
+            String[] input = getNextInput("TreeTool");
+            switch(input[0]) {
+                case "exit": case "q":
+                    exit = true; break;
+                case "fullagg": case "fa":
+                    tree.printFullAgg();
+                    break;
+                case "full": case "f":
+                    tree.printFull();
+                    break;
+                case "filterbasis": case "fb":
+                    System.out.println(tree.getFilterBase());
+                    break;
+                case "basis": case "b":
+                    System.out.println(tree.getBase());
+                    break;
+                case "aggregate": case "a":
+                    for(Entry e : tree.itemAgg.entrySet()) 
+                        System.out.print(e.getKey() + ":" + e.getValue() + ", ");
+                    System.out.println("");
+                    break;
+                case "machines": case "m":
+                    System.out.println(tree.getMachinesUsed());
+                    break;
+                default: 
                     System.out.println("Command not recognized: " + input[0]);
             }
         }
@@ -94,12 +137,25 @@ public class MCComplexCrafter {
                     r.items.remove(input[1]);
                     System.out.println("Item requirement for \"" + input[1] + "\" deleted.");
                     break;
+                case "setmachine": case "m":
+                    if(input.length < 2) {
+                        System.out.println("Machine requirement deleted.");
+                        r.machine = "";
+                    }
+                    if(input.length > 2) {System.out.println("Too many arguments."); break;}
+                    r.machine = input[1];
+                    System.out.println("Machine requirement set to \"" + input[1] + "\".");
+                    break;
                 case "listreqs": case "l":
                     if(!r.hasRecipe) {System.out.println("No recipe requirements exist."); break;}
                     System.out.println(r); break;
                 case "toggleprep": case "p":
                     System.out.println("Crafting preparation set to " + !r.prepCraft);
                     r.prepCraft = !r.prepCraft;
+                    break;
+                case "togglebasic": case "b":
+                    r.basic = !r.basic;
+                    System.out.println("Item is now " + (r.basic ? "basic." : "nonbasic."));
                     break;
                 default:
                     System.out.println("Command not recognized: " + input[0]);
