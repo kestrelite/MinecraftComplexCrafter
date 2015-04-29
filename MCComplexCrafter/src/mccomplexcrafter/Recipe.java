@@ -1,8 +1,9 @@
 package mccomplexcrafter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Recipe {
+public class Recipe implements Serializable {
     public ArrayList<String> items = new ArrayList<>();
     public ArrayList<Integer> quantity = new ArrayList<>();
     

@@ -1,6 +1,8 @@
 package mccomplexcrafter;
 
 import itemtree.ItemNode;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -15,7 +17,7 @@ public class MCComplexCrafter {
         return s.nextLine().split(" ");
     }
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
         System.out.println("MCComplexCrafter console!");
         
         boolean exit = false;
@@ -25,6 +27,17 @@ public class MCComplexCrafter {
             switch(input[0]) {
                 case "exit":
                     exit = true;
+                    break;
+                case "save":
+                    if(input.length < 2) {System.out.println("Not enough arguments."); break;}
+                    if(input.length > 2) {System.out.println("Too many arguments."); break;}
+                    ObjectWriter.write(itemList, input[1]);
+                    break;
+                case "load":
+                    if(input.length < 2) {System.out.println("Not enough arguments."); break;}
+                    if(input.length > 2) {System.out.println("Too many arguments."); break;}
+                    if(!(new File(input[1]).exists())) {System.out.println("File does not exist."); break;}
+                    itemList = (HashMap<String, Recipe>) ObjectWriter.read(input[1]);
                     break;
                 case "additem": case "a":
                     if(input.length < 2) {System.out.println("Not enough arguments."); break;}
@@ -57,7 +70,7 @@ public class MCComplexCrafter {
                     if(input.length < 2) {System.out.println("Not enough arguments."); break;}
                     if(!itemList.containsKey(input[1])) {System.out.println("Item does not exist."); break;}
                     System.out.println("Editing recipe for item \"" + input[1] + "\"...");
-                    Recipe r = recpieEditor(itemList.get(input[1]));
+                    Recipe r = recipeEditor(itemList.get(input[1]));
                     itemList.put(input[1], r);
                     System.out.println("Recipe for \"" + input[1] + "\" has been updated.");
                     break;
@@ -132,7 +145,7 @@ public class MCComplexCrafter {
         while(exit == false) {
             String[] input = getNextInput("TreeTool");
             switch(input[0]) {
-                case "exit":
+                case "back":
                     exit = true; break;
                 case "aggtree": case "ta":
                     tree.printFullAgg();
@@ -163,7 +176,7 @@ public class MCComplexCrafter {
         }
     }
 
-    private static Recipe recpieEditor(Recipe r) {
+    private static Recipe recipeEditor(Recipe r) {
         boolean exit = false;
         while(exit == false) {
             String[] input = getNextInput("Recipe");
@@ -176,7 +189,7 @@ public class MCComplexCrafter {
                     if(input.length > 3) {System.out.println("Too many arguments."); break;}
                     if(!input[2].matches("\\d+")) {System.out.println("Quantity must be a number."); break;}
                     if(!itemList.containsKey(input[1])) {System.out.println("WARN: Item \"" + input[1] + "\" does not (yet) exist.");}
-                    System.out.println("Requiring " + input[2] + " of \"" + input[1] + "\".");
+                    //System.out.println("Requiring " + input[2] + " of \"" + input[1] + "\".");
                     r.addItemRequirement(input[1], Integer.parseInt(input[2]));
                     break;
                 case "delreq": case "d":
@@ -185,7 +198,7 @@ public class MCComplexCrafter {
                     if(!r.items.contains(input[1])) {System.out.println("That item does not exist."); break;}
                     r.quantity.remove(r.items.indexOf(input[1]));
                     r.items.remove(input[1]);
-                    System.out.println("Item requirement for \"" + input[1] + "\" deleted.");
+                    //System.out.println("Item requirement for \"" + input[1] + "\" deleted.");
                     break;
                 case "setmachine": case "m":
                     if(input.length < 2) {
@@ -194,7 +207,7 @@ public class MCComplexCrafter {
                     }
                     if(input.length > 2) {System.out.println("Too many arguments."); break;}
                     r.machine = input[1];
-                    System.out.println("Machine requirement set to \"" + input[1] + "\".");
+                    //System.out.println("Machine requirement set to \"" + input[1] + "\".");
                     break;
                 case "listreqs": case "l":
                     if(!r.hasRecipe) {System.out.println("No recipe requirements exist."); break;}
@@ -212,7 +225,7 @@ public class MCComplexCrafter {
                     if(input.length > 2) {System.out.println("Too many arguments."); break;}
                     if(!input[1].matches("\\d+")) {System.out.println("Quantity must be a number."); break;}
                     r.qtyOut = Integer.parseInt(input[1]);
-                    System.out.println("Quantity out is now " + r.qtyOut + ".");
+                    //System.out.println("Quantity out is now " + r.qtyOut + ".");
                     break;
                 default:
                     System.out.println("Command not recognized: " + input[0]);
