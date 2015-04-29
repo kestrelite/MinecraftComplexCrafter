@@ -9,7 +9,8 @@ public class Recipe {
     public boolean prepCraft = false;
     public boolean hasRecipe = false;
     public boolean basic = false;
-    
+
+    public float qtyOut = 1;
     public String machine = "";
     
     public void addItemRequirement(String item, int quantity) {

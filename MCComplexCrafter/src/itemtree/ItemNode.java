@@ -8,8 +8,8 @@ import mccomplexcrafter.Recipe;
 public class ItemNode {
     private static final HashMap<String, Recipe> itemList = MCComplexCrafter.itemList;
     
-    public static HashMap<String, Integer> itemAgg = new HashMap<>();
-    public static int aggQuantity = 1;
+    public static HashMap<String, Float> itemAgg = new HashMap<>();
+    public static float aggQuantity = 1;
     
     public ArrayList<ItemNode> subNodes = new ArrayList<>();
     public String name;
@@ -26,7 +26,7 @@ public class ItemNode {
         recipe = itemList.get(item);
         
         if(!recipe.hasRecipe) {
-            int currQ = (itemAgg.containsKey(name) ? itemAgg.get(name) : 0);
+            float currQ = (itemAgg.containsKey(name) ? itemAgg.get(name) : 0);
             itemAgg.put(name, aggQuantity + currQ);
             return;
         }
@@ -34,9 +34,10 @@ public class ItemNode {
         for(String i : recipe.items) {            
             if(!itemList.containsKey(i)) itemList.put(i, new Recipe());
             //System.out.println(name + " requires " + i);
-            aggQuantity *= recipe.quantity.get(recipe.items.indexOf(i));
+            float aggScalar = ((float)recipe.quantity.get(recipe.items.indexOf(i))) / recipe.qtyOut;
+            aggQuantity *= aggScalar;
             subNodes.add(new ItemNode(i));
-            aggQuantity /= recipe.quantity.get(recipe.items.indexOf(i));
+            aggQuantity /= aggScalar;
         }
     }
 
@@ -48,7 +49,8 @@ public class ItemNode {
         if(!recipe.hasRecipe) return;
         for(int i = 0; i < recipe.items.size(); i++) {
             for(int j = 0; j < tabs; j++) System.out.print("|\t");
-            System.out.println((aggQuantity * recipe.quantity.get(i)) + " of " + recipe.items.get(i));
+            float qtyNeeded = aggQuantity * ((float)recipe.quantity.get(i))/recipe.qtyOut;
+            System.out.println(Math.ceil(qtyNeeded) + " of " + recipe.items.get(i));
             aggQuantity *= recipe.quantity.get(i);
             subNodes.get(i).printFullAgg(tabs+1);
             aggQuantity /= recipe.quantity.get(i);
@@ -63,7 +65,8 @@ public class ItemNode {
         if(!recipe.hasRecipe) return;
         for(int i = 0; i < recipe.items.size(); i++) {
             for(int j = 0; j < tabs; j++) System.out.print("|\t");
-            System.out.println(recipe.quantity.get(i) + " of " + recipe.items.get(i) +
+            float qtyNeeded = ((float)recipe.quantity.get(i))/recipe.qtyOut;
+            System.out.println(Math.ceil(qtyNeeded) + " of " + recipe.items.get(i) +
                     (recipe.machine != "" ? " ("+recipe.machine+")" : ""));
             subNodes.get(i).printFull(tabs+1);
         }

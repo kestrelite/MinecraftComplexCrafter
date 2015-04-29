@@ -22,7 +22,7 @@ public class MCComplexCrafter {
         while(exit == false) {
             String[] input = getNextInput("Main");
             switch(input[0]) {
-                case "exit": case "q":
+                case "exit":
                     exit = true;
                     break;
                 case "additem": case "a":
@@ -65,6 +65,7 @@ public class MCComplexCrafter {
                     if(!itemList.containsKey(input[1])) {System.out.println("Item does not exist."); break;}
                     if(!itemList.get(input[1]).hasRecipe) {System.out.println("This item has no recipe."); break;}
                     System.out.println(itemList.get(input[1]));
+                    System.out.println("Quantity out: " + itemList.get(input[1]).qtyOut);
                     break;
                 case "tree": case "t":
                     if(input.length < 2) {System.out.println("Not enough arguments."); break;}
@@ -85,7 +86,7 @@ public class MCComplexCrafter {
         while(exit == false) {
             String[] input = getNextInput("TreeTool");
             switch(input[0]) {
-                case "exit": case "q":
+                case "exit":
                     exit = true; break;
                 case "fullagg": case "fa":
                     tree.printFullAgg();
@@ -101,7 +102,7 @@ public class MCComplexCrafter {
                     break;
                 case "aggregate": case "a":
                     for(Entry e : tree.itemAgg.entrySet()) 
-                        System.out.print(e.getKey() + ":" + e.getValue() + ", ");
+                        System.out.print(e.getKey() + ":" + Math.ceil((float) e.getValue()) + ", ");
                     System.out.println("");
                     break;
                 case "machines": case "m":
@@ -118,7 +119,7 @@ public class MCComplexCrafter {
         while(exit == false) {
             String[] input = getNextInput("Recipe");
             switch(input[0]) {
-                case "exit": case "q":
+                case "exit":
                     exit = true; break;
                 case "editreq": case "e":
                 case "addreq": case "a":
@@ -156,6 +157,13 @@ public class MCComplexCrafter {
                 case "togglebasic": case "b":
                     r.basic = !r.basic;
                     System.out.println("Item is now " + (r.basic ? "basic." : "nonbasic."));
+                    break;
+                case "qtyout": case "o":
+                    if(input.length < 2) {System.out.println("Not enough arguments."); break;}
+                    if(input.length > 2) {System.out.println("Too many arguments."); break;}
+                    if(!input[1].matches("\\d+")) {System.out.println("Quantity must be a number."); break;}
+                    r.qtyOut = Integer.parseInt(input[1]);
+                    System.out.println("Quantity out is now " + r.qtyOut + ".");
                     break;
                 default:
                     System.out.println("Command not recognized: " + input[0]);
