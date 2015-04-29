@@ -71,7 +71,8 @@ public class ItemNode {
             for(int j = 0; j < tabs; j++) System.out.print("|\t");
             float qtyNeeded = ((float)recipe.quantity.get(i))/recipe.qtyOut;
             System.out.println(Math.ceil(qtyNeeded) + " of " + recipe.items.get(i) +
-                    (recipe.machine != "" ? " ("+recipe.machine+")" : ""));
+                    (!subNodes.get(i).recipe.machine.equals("") ? " ("+subNodes.get(i).recipe.machine+")" : "") + 
+                    (subNodes.get(i).recipe.prepCraft ? " [PREP]" : ""));
             subNodes.get(i).printFull(tabs+1);
         }
     }
