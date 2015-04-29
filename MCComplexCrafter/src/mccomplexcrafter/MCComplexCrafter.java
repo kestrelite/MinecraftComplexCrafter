@@ -1,6 +1,7 @@
 package mccomplexcrafter;
 
 import itemtree.ItemNode;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Scanner;
@@ -70,15 +71,60 @@ public class MCComplexCrafter {
                 case "tree": case "t":
                     if(input.length < 2) {System.out.println("Not enough arguments."); break;}
                     if(!itemList.containsKey(input[1])) {System.out.println("Item does not exist."); break;}
-                    System.out.println("Entering build tree tool for \"" + input[1] + "\"...");
+                    System.out.println("Entering tree tool for \"" + input[1] + "\"...");
                     treeTool(input[1]);
                     break;
+                case "build": case "b":
+                    if(input.length < 2) {System.out.println("Not enough arguments."); break;}
+                    if(!itemList.containsKey(input[1])) {System.out.println("Item does not exist."); break;}
+                    System.out.println("Entering build tool for \"" + input[1] + "\"...");
+                    buildTool(input[1]); break;
                 default:
                     System.out.println("Command not recognized: " + input[0]);
             }
         }
     }
 
+    private static void buildTool(String item) {
+        ItemNode.clearStatics();
+        ItemNode node = new ItemNode(item);
+        ArrayList<ItemNode> materials = node.stripBottom();
+        int step = 1;
+        
+        System.out.print("STEP 1: Gather the following: ");
+        for(Entry e : node.bottomAgg.entrySet()) 
+            System.out.print(e.getKey() + ":" + (int)Math.ceil((float) e.getValue()) + ", ");
+        s.nextLine();
+        
+        ArrayList<String> nameList = new ArrayList<>();
+        
+        while(!node.subNodes.isEmpty()) {
+            step++; ArrayList<ItemNode> stepProd = node.stripBottom();
+            System.out.println("\nSTEP " + step);
+            
+            for(ItemNode n : stepProd) {
+                if(nameList.contains(n.name)) continue;
+                if(n.recipe.prepCraft) {
+                    System.out.print("Prep  " + n.fullAgg.get(n.name) + "x " + n.name + " using: " + n.recipe.toString() + " each.");
+                    nameList.add(n.name);
+                    s.nextLine();
+                }
+            }
+
+            for(ItemNode n : stepProd) {
+                if(nameList.contains(n.name)) continue;
+                if(!n.recipe.prepCraft) {
+                    System.out.print("Craft " + n.fullAgg.get(n.name) + "x " + n.name + " using: " + n.recipe.toString() + " each.");
+                    nameList.add(n.name);
+                    s.nextLine();
+                }
+            }
+        }
+        
+        System.out.println("\nSTEP " + (step + 1) + ": Using your remaining items, craft a(n) " + item + ".");
+        System.out.println("BUILD COMPLETE.");
+    }
+    
     private static void treeTool(String item) {
         ItemNode.clearStatics();
         ItemNode tree = new ItemNode(item);
@@ -88,10 +134,10 @@ public class MCComplexCrafter {
             switch(input[0]) {
                 case "exit":
                     exit = true; break;
-                case "fullagg": case "fa":
+                case "aggtree": case "ta":
                     tree.printFullAgg();
                     break;
-                case "full": case "f":
+                case "tree": case "t":
                     tree.printFull();
                     break;
                 case "filterbasis": case "fb":
@@ -100,11 +146,14 @@ public class MCComplexCrafter {
                 case "basis": case "b":
                     System.out.println(tree.getBase());
                     break;
+                case "fullaggregate": case "fa":
+                    for(Entry e : tree.fullAgg.entrySet())
+                        System.out.print(e.getKey() + ":" + (int)Math.ceil((float) e.getValue()) + ", ");
+                    System.out.println(""); break;
                 case "aggregate": case "a":
-                    for(Entry e : tree.itemAgg.entrySet()) 
-                        System.out.print(e.getKey() + ":" + Math.ceil((float) e.getValue()) + ", ");
-                    System.out.println("");
-                    break;
+                    for(Entry e : tree.bottomAgg.entrySet()) 
+                        System.out.print(e.getKey() + ":" + (int)Math.ceil((float) e.getValue()) + ", ");
+                    System.out.println(""); break;
                 case "machines": case "m":
                     System.out.println(tree.getMachinesUsed());
                     break;

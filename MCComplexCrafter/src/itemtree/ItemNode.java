@@ -8,7 +8,8 @@ import mccomplexcrafter.Recipe;
 public class ItemNode {
     private static final HashMap<String, Recipe> itemList = MCComplexCrafter.itemList;
     
-    public static HashMap<String, Float> itemAgg = new HashMap<>();
+    public static HashMap<String, Float> bottomAgg = new HashMap<>();
+    public static HashMap<String, Float> fullAgg = new HashMap<>();
     public static float aggQuantity = 1;
     
     public ArrayList<ItemNode> subNodes = new ArrayList<>();
@@ -16,7 +17,8 @@ public class ItemNode {
     public Recipe recipe;
 
     public static void clearStatics() {
-        itemAgg = new HashMap<>();
+        bottomAgg = new HashMap<>();
+        fullAgg = new HashMap<>();
         aggQuantity = 1;
     }
     
@@ -25,11 +27,13 @@ public class ItemNode {
         name = item;
         recipe = itemList.get(item);
         
+        float currFullQ = (fullAgg.containsKey(name) ? fullAgg.get(name) : 0);
+        fullAgg.put(name, aggQuantity + currFullQ);
         if(!recipe.hasRecipe) {
-            float currQ = (itemAgg.containsKey(name) ? itemAgg.get(name) : 0);
-            itemAgg.put(name, aggQuantity + currQ);
+            float currQ = (bottomAgg.containsKey(name) ? bottomAgg.get(name) : 0);
+            bottomAgg.put(name, aggQuantity + currQ);
             return;
-        }
+        } 
         
         for(String i : recipe.items) {            
             if(!itemList.containsKey(i)) itemList.put(i, new Recipe());
@@ -115,6 +119,23 @@ public class ItemNode {
                 if(!ret.contains(s)) ret.add(s);
         }
         
+        return ret;
+    }
+    
+    public ArrayList<ItemNode> stripBottom() {
+        ArrayList<ItemNode> ret = new ArrayList<>();
+        
+        if(subNodes.isEmpty()) {ret.add(this); return ret;}
+        
+        ArrayList<ItemNode> newSubNodes = new ArrayList<>();
+        
+        for(ItemNode node : subNodes) {
+            ArrayList<ItemNode> obj = node.stripBottom();
+            for(ItemNode n : obj) if(!ret.contains(n)) ret.add(n);
+            if(!obj.contains(node)) newSubNodes.add(node);
+        }
+        
+        subNodes = newSubNodes;
         return ret;
     }
 }
